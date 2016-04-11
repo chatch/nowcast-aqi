@@ -1,0 +1,28 @@
+{
+    "name": "nowcast-aqi",
+    "description": "Nowcast AQI calculator",
+    "version": "0.0.1",
+    "author": "Chris Hatch",
+    "license": "GPL-3.0",
+    "keywords": [
+      "nowcast",
+      "aqi",
+      "epa",
+      "pm2.5",
+      "pm10",
+      "air",
+      "environment"
+   ],
+    "main": "nowcast-aqi.js",
+    "scripts": {
+        "test": "mocha test/test.js"
+    },
+    "repository": {
+        "url": "git://github.com/chatch/nowcast-aqi.git",
+        "type": "git"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "mocha": "^2.4.5"
+    }
+}
