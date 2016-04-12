@@ -1,23 +1,32 @@
 'use strict'
-
+//
 // See nowcast formula details here:
 //   https://www3.epa.gov/airnow/ani/pm25_aqi_reporting_nowcast_overview.pdf
+//   https://en.wikipedia.org/wiki/Nowcast_%28Air_Quality_Index%29
 //
-// Calculates Nowcast given 12 hourly concentrations.
+let util = require('util')
 
-const NUM_HOURS = 12
-const WEIGHT_FACTOR_MIN = 0.5
+const NUM_HOURS_PM = 12
+const WEIGHT_FACTOR_MIN_PM = 0.5
 
-// Calculate the nowcast value
-//  cByHour: Hourly concentrations
-function nowcast(cByHour) {
-    if (cByHour.length != NUM_HOURS)
+// Calculate the nowcast value for PM
+//  cByHour: Hourly concentrations for the previous 12 hours (order: recent to oldest)
+function nowcastPM(cByHour) {
+    return nowcast(cByHour, NUM_HOURS_PM, WEIGHT_FACTOR_MIN_PM)
+}
+
+// Calculate the nowcast value given formula variables:
+//  cByHour: Hourly concentrations for the previous numHours hours (order: recent to oldest)
+//  numHours: num of hours to calculate for
+//  weightFactorMin (optional): weight factor raised to this min if calculated less then this
+function nowcast(cByHour, numHours, weightFactorMin) {
+    if (cByHour.length != numHours)
         return
 
-    if (!cByHour[0] || !cByHour[1])
+    if (util.isUndefined(cByHour[0]) || util.isUndefined(cByHour[1]))
         return
 
-    let wFactor = weightFactor(cByHour)
+    let wFactor = weightFactor(cByHour, weightFactorMin)
 
     let sumHourlyByWeightFactor = cByHour.reduce(function (prev, curr, idx) {
         if (!curr) return prev
@@ -32,17 +41,31 @@ function nowcast(cByHour) {
     })
 
     let nowCast = sumHourlyByWeightFactor / sumWeightFactor
-    return nowCast.toFixed(1)
+    return nowCast
 }
 
 // Calculate the weight factor ('w' in the nowcast formula)
-// Calculate the weight factor ('w' in the nowcast formula)
-//  cByHour: list of PM concentrations by hour
-function weightFactor(cByHour) {
-    let min = Math.min(Math, cByHour)
-    let max = Math.max(Math, cByHour)
-    let rateOfChange = 1 - (min / max)
-    return rateOfChange > WEIGHT_FACTOR_MIN ? rateOfChange : WEIGHT_FACTOR_MIN
+//  cByHour: list of concentrations by hour
+//  weightFactorMin (optional): weight factor raised to this min if calculated less then this
+function weightFactor(cByHour, weightFactorMin) {
+    let hours = filterUndefined(cByHour)
+    let min = Math.min.apply(Math, hours)
+    let max = Math.max.apply(Math, hours)
+    let range = max = min
+    let rateOfChange = range / max
+    let factor = 1 - rateOfChange;
+    if (weightFactorMin && factor <= weightFactorMin)
+        factor = weightFactorMin
+    return factor
 }
 
-module.exports.nowcast = nowcast
+function filterUndefined(list) {
+    return list.filter(function (listVal) {
+        return !(util.isNullOrUndefined(listVal))
+    })
+}
+
+module.exports = {
+    'pm': nowcastPM,
+    'custom': nowcast
+}
