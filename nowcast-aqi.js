@@ -7,12 +7,28 @@
 let util = require('util')
 
 const NUM_HOURS_PM = 12
+const NUM_HOURS_PM_ASIA = 3
+const NUM_HOURS_OZONE = 8
 const WEIGHT_FACTOR_MIN_PM = 0.5
+const WEIGHT_FACTOR_MIN_PM_ASIA = 0.1
 
 // Calculate the nowcast value for PM
 //  cByHour: Hourly concentrations for the previous 12 hours (order: recent to oldest)
 function nowcastPM(cByHour) {
     return nowcast(cByHour, NUM_HOURS_PM, WEIGHT_FACTOR_MIN_PM)
+}
+
+// Calculate the 'asian nowcast' value for PM as proposed by aqicn:
+//  http://aqicn.org/faq/2015-03-15/air-quality-nowcast-a-beginners-guide/
+//  cByHour: Hourly concentrations for the previous 8 hours
+function nowcastPMAsian(cByHour) {
+    return nowcast(cByHour, NUM_HOURS_PM_ASIA, WEIGHT_FACTOR_MIN_PM_ASIA)
+}
+
+// Calculate the nowcast value for Ozone
+//  cByHour: Hourly concentrations for the previous 8 hours
+function nowcastOzone(cByHour) {
+    return nowcast(cByHour, NUM_HOURS_OZONE)
 }
 
 // Calculate the nowcast value given formula variables:
@@ -51,7 +67,7 @@ function weightFactor(cByHour, weightFactorMin) {
     let hours = filterUndefined(cByHour)
     let min = Math.min.apply(Math, hours)
     let max = Math.max.apply(Math, hours)
-    let range = max = min
+    let range = max - min
     let rateOfChange = range / max
     let factor = 1 - rateOfChange;
     if (weightFactorMin && factor <= weightFactorMin)
@@ -67,5 +83,7 @@ function filterUndefined(list) {
 
 module.exports = {
     'pm': nowcastPM,
+    'pmAsian': nowcastPMAsian,
+    'ozone': nowcastOzone,
     'custom': nowcast
 }
