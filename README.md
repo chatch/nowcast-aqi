@@ -1,4 +1,5 @@
 # nowcast-aqi
+[![](https://img.shields.io/npm/v/nowcast-aqi.svg)](https://www.npmjs.com/package/nowcast-aqi)
 [![Build Status](https://travis-ci.org/chatch/nowcast-aqi.svg?branch=master)](https://travis-ci.org/chatch/nowcast-aqi)
 
 [Nowcast AQI](https://en.wikipedia.org/wiki/Nowcast_%28Air_Quality_Index%28) calculator
