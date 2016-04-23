@@ -1,7 +1,7 @@
 {
   "name": "nowcast-aqi",
   "description": "Nowcast AQI calculator",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Chris Hatch",
   "license": "GPL-3.0",
   "keywords": [
